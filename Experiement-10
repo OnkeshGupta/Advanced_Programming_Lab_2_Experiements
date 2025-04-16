@@ -1,0 +1,51 @@
+/* Problem Statement:
+Given an unsigned integer n, write a function that returns the number of '1' bits it has (also known as the Hamming weight). */
+class Solution {
+public:
+    int hammingWeight(uint32_t n) {
+        int count = 0;
+        while (n) {
+            n = n & (n - 1);  // Clear the rightmost '1' bit
+            count++;
+        }
+        return count;
+    }
+};
+
+/* Problem Statement:
+Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+An input string is valid if:
+Open brackets are closed by the same type of brackets.
+Open brackets are closed in the correct order. */
+#include <iostream>
+#include <stack>
+using namespace std;
+
+class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> stk;  // Stack to store opening brackets
+        for (char c : s) {
+            if (c == '(' || c == '{' || c == '[') {
+                stk.push(c);  // Push opening brackets onto the stack
+            } else {
+                if (stk.empty()) {
+                    return false;  // Stack is empty, no matching opening bracket
+                }
+                char top = stk.top();
+                stk.pop();
+                if ((c == ')' && top != '(') || (c == '}' && top != '{') || (c == ']' && top != '[')) {
+                    return false;  // Brackets do not match
+                }
+            }
+        }
+        return stk.empty();  // If stack is empty, all brackets were matched
+    }
+};
+
+int main() {
+    Solution sol;
+    string s = "{[]}";
+    cout << "Is the string valid? " << (sol.isValid(s) ? "Yes" : "No") << endl;
+    return 0;
+}
