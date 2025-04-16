@@ -1,0 +1,292 @@
+/* Problem Statement:
+There are n children standing in a line. Each child is assigned a rating value given in the integer array ratings. You are giving candies to these children subject to the following requirements:
+Each child must have at least one candy.
+Children with a higher rating get more candies than their neighbors.
+Return the minimum number of candies you need to distribute to the children. */
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int candy(vector<int>& ratings) {
+    int n = ratings.size();
+    if (n == 0) return 0;
+    
+    vector<int> candies(n, 1);  // Each child gets at least one candy
+    
+    // Left to Right pass
+    for (int i = 1; i < n; ++i) {
+        if (ratings[i] > ratings[i - 1]) {
+            candies[i] = candies[i - 1] + 1;
+        }
+    }
+    
+    // Right to Left pass
+    for (int i = n - 2; i >= 0; --i) {
+        if (ratings[i] > ratings[i + 1]) {
+            candies[i] = max(candies[i], candies[i + 1] + 1);
+        }
+    }
+    
+    // Sum up the candies array to get the total number of candies
+    int totalCandies = 0;
+    for (int candy : candies) {
+        totalCandies += candy;
+    }
+    
+    return totalCandies;
+}
+
+int main() {
+    vector<int> ratings = {1, 0, 2};
+    cout << "Minimum number of candies: " << candy(ratings) << endl;  // Output: 5
+    return 0;
+}
+
+/* Problem Statement:
+You are given an integer array prices where prices[i] is the price of a given stock on the ith day. On each day, you may decide to buy and/or sell the stock. You can only hold at most one share of the stock at any time. However, you can buy it and then immediately sell it on the same day.
+Find and return the maximum profit you can achieve. */
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int maxProfit(vector<int>& prices) {
+    int profit = 0;
+    
+    for (int i = 1; i < prices.size(); ++i) {
+        // If the price increases, add the difference to the profit
+        if (prices[i] > prices[i - 1]) {
+            profit += prices[i] - prices[i - 1];
+        }
+    }
+    
+    return profit;
+}
+
+int main() {
+    vector<int> prices = {7, 1, 5, 3, 6, 4};
+    cout << "Maximum profit: " << maxProfit(prices) << endl;  // Output: 7
+    return 0;
+}
+
+/* Problem Statement:
+Given a string s, remove duplicate letters so that every letter appears once and only once. You must make sure your result is the smallest in lexicographical order among all possible results. */
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <stack>
+#include <unordered_set>
+using namespace std;
+
+string removeDuplicateLetters(string s) {
+    unordered_map<char, int> count;
+    unordered_set<char> inStack;
+    stack<char> stack;
+    
+    // Count the frequency of each character
+    for (char c : s) {
+        count[c]++;
+    }
+    
+    for (char c : s) {
+        // Decrease the count of the current character
+        count[c]--;
+        
+        // If the character is already in the stack, skip it
+        if (inStack.find(c) != inStack.end()) {
+            continue;
+        }
+        
+        // Remove characters from the stack that are greater than the current one
+        // and will appear later in the string
+        while (!stack.empty() && stack.top() > c && count[stack.top()] > 0) {
+            inStack.erase(stack.top());
+            stack.pop();
+        }
+        
+        // Push the current character to the stack and mark it as in the stack
+        stack.push(c);
+        inStack.insert(c);
+    }
+    
+    // Build the result string from the stack
+    string result = "";
+    while (!stack.empty()) {
+        result = stack.top() + result;
+        stack.pop();
+    }
+    
+    return result;
+}
+
+int main() {
+    string s = "bcabc";
+    cout << "Result: " << removeDuplicateLetters(s) << endl;  // Output: "abc"
+    
+    s = "cbacdcbc";
+    cout << "Result: " << removeDuplicateLetters(s) << endl;  // Output: "acdb"
+    
+    return 0;
+}
+
+/* Problem Statement:
+You have a long flowerbed in which some of the plots are planted, and some are not. However, flowers cannot be planted in adjacent plots.
+Given an integer array flowerbed containing 0s and 1s, where 0 means empty and 1 means not empty, and an integer n, return true if n new flowers can be planted in the flowerbed without violating the no-adjacent-flowers rule and false otherwise. */
+#include <iostream>
+#include <vector>
+using namespace std;
+
+bool canPlaceFlowers(vector<int>& flowerbed, int n) {
+    int count = 0;
+    int size = flowerbed.size();
+
+    for (int i = 0; i < size; ++i) {
+        // Check if the current plot is empty and the neighbors are also empty
+        if (flowerbed[i] == 0) {
+            bool canPlant = true;
+            if (i > 0 && flowerbed[i - 1] == 1) {
+                canPlant = false;  // Left neighbor is occupied
+            }
+            if (i < size - 1 && flowerbed[i + 1] == 1) {
+                canPlant = false;  // Right neighbor is occupied
+            }
+
+            if (canPlant) {
+                flowerbed[i] = 1;  // Plant the flower
+                count++;  // Increment the count of flowers planted
+                if (count >= n) {
+                    return true;  // If we've planted enough flowers, return true
+                }
+                i++;  // Skip the next plot since we just planted a flower
+            }
+        }
+    }
+
+    return count >= n;  // Return whether we planted enough flowers
+}
+
+int main() {
+    vector<int> flowerbed = {1, 0, 0, 0, 1};
+    int n = 1;
+    cout << (canPlaceFlowers(flowerbed, n) ? "True" : "False") << endl;  // Output: True
+    
+    flowerbed = {1, 0, 0, 0, 1};
+    n = 2;
+    cout << (canPlaceFlowers(flowerbed, n) ? "True" : "False") << endl;  // Output: False
+    
+    return 0;
+}
+
+/* Problem Statement:
+Assume you are an awesome parent and want to give your children some cookies. But you should give each child at most one cookie. Each child i has a greed factor g[i], which is the minimum size of a cookie that the child will be content with, and each cookie j has a size s[j]. If s[j] >= g[i], we can assign the cookie j to the child i, and the child i will be content. Your goal is to maximize the number of your content children and output the maximum number. */
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int findContentChildren(vector<int>& g, vector<int>& s) {
+    // Sort the greed factors and the cookie sizes
+    sort(g.begin(), g.end());
+    sort(s.begin(), s.end());
+
+    int child = 0;  // Pointer for children
+    int cookie = 0; // Pointer for cookies
+    int contentChildren = 0;
+
+    // Try to assign cookies to children
+    while (child < g.size() && cookie < s.size()) {
+        if (s[cookie] >= g[child]) {  // If the cookie can satisfy the child's greed
+            contentChildren++;  // This child is content
+            child++;  // Move to the next child
+        }
+        cookie++;  // Always move to the next cookie
+    }
+
+    return contentChildren;
+}
+
+int main() {
+    vector<int> g = {1, 2, 3};  // Greed factors of children
+    vector<int> s = {1, 1};     // Sizes of cookies
+    cout << "Max content children: " << findContentChildren(g, s) << endl;  // Output: 1
+    
+    vector<int> g2 = {1, 2};    // Greed factors of children
+    vector<int> s2 = {1, 2, 3}; // Sizes of cookies
+    cout << "Max content children: " << findContentChildren(g2, s2) << endl;  // Output: 2
+    
+    return 0;
+}
+
+/* Problem Statement:
+You are given an array arr which consists of only zeros and ones, divide the array into three non-empty parts such that all of these parts represent the same binary value.
+If it is possible, return any [i, j] with i + 1 < j, such that:
+arr[0], arr[1], ..., arr[i] is the first part,
+arr[i + 1], arr[i + 2], ..., arr[j - 1] is the second part, and
+arr[j], arr[j + 1], ..., arr[arr.length - 1] is the third part.
+All three parts should have equal binary values.
+If it is not possible, return [-1, -1]. */
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> threeEqualParts(vector<int>& arr) {
+    int ones_count = 0;
+    
+    // Count the total number of ones in the array
+    for (int num : arr) {
+        if (num == 1) {
+            ones_count++;
+        }
+    }
+    
+    // If ones_count is not divisible by 3, return [-1, -1]
+    if (ones_count % 3 != 0) {
+        return {-1, -1};
+    }
+    
+    // If no ones are in the array, any split is valid
+    if (ones_count == 0) {
+        return {0, arr.size() - 1};
+    }
+    
+    // We need to split the ones_count into three equal parts
+    int target = ones_count / 3;
+    
+    // Find the indices of the first, second, and third "1"s
+    int first = -1, second = -1, third = -1;
+    int count = 0;
+    
+    for (int i = 0; i < arr.size(); i++) {
+        if (arr[i] == 1) {
+            count++;
+            if (count == 1) {
+                first = i;
+            } else if (count == target + 1) {
+                second = i;
+            } else if (count == 2 * target + 1) {
+                third = i;
+            }
+        }
+    }
+    
+    // Now we need to check if the binary values of the three parts are equal
+    while (third < arr.size() && arr[first] == arr[second] && arr[second] == arr[third]) {
+        first++;
+        second++;
+        third++;
+    }
+    
+    if (third == arr.size()) {
+        return {first - 1, second};
+    }
+    
+    return {-1, -1};
+}
+
+int main() {
+    vector<int> arr = {1, 0, 1, 0, 1, 0};
+    vector<int> result = threeEqualParts(arr);
+    
+    cout << "Result: [" << result[0] << ", " << result[1] << "]" << endl;
+    return 0;
+}
