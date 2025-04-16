@@ -1,0 +1,418 @@
+// Problem: Given the roots of two binary trees p and q, write a function to check if they are the same or not. Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+#include <iostream>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+bool isSameTree(TreeNode* p, TreeNode* q) {
+    if (!p && !q) return true;               // Both nodes are null
+    if (!p || !q) return false;              // One is null
+    if (p->val != q->val) return false;      // Values differ
+
+    // Recursively check left and right subtrees
+    return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+}
+
+// Example Usage
+int main() {
+    // Create Tree 1:     1
+    //                   / \
+    //                  2   3
+    TreeNode* p = new TreeNode(1);
+    p->left = new TreeNode(2);
+    p->right = new TreeNode(3);
+
+    // Create Tree 2:     1
+    //                   / \
+    //                  2   3
+    TreeNode* q = new TreeNode(1);
+    q->left = new TreeNode(2);
+    q->right = new TreeNode(3);
+
+    cout << (isSameTree(p, q) ? "Trees are the same" : "Trees are different") << endl;
+
+    return 0;
+}
+
+// Problem: Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
+#include <iostream>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+// Helper function to check mirror symmetry
+bool isMirror(TreeNode* left, TreeNode* right) {
+    if (!left && !right) return true;             // Both null
+    if (!left || !right) return false;            // One is null
+    if (left->val != right->val) return false;    // Values differ
+
+    return isMirror(left->left, right->right) &&
+           isMirror(left->right, right->left);
+}
+
+// Main function to check symmetry
+bool isSymmetric(TreeNode* root) {
+    if (!root) return true;
+    return isMirror(root->left, root->right);
+}
+
+// Example usage
+int main() {
+    // Create a symmetric tree:
+    //        1
+    //       / \
+    //      2   2
+    //     / \ / \
+    //    3  4 4  3
+
+    TreeNode* root = new TreeNode(1);
+    root->left = new TreeNode(2);
+    root->right = new TreeNode(2);
+    root->left->left = new TreeNode(3);
+    root->left->right = new TreeNode(4);
+    root->right->left = new TreeNode(4);
+    root->right->right = new TreeNode(3);
+
+    cout << (isSymmetric(root) ? "Tree is symmetric" : "Tree is not symmetric") << endl;
+
+    return 0;
+}
+
+// Problem: Given a binary tree, determine if it is height-balanced. A binary tree is height-balanced if the difference between the heights of the left and right subtrees of any node is no more than 1.
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+// Helper function to check if the tree is balanced and return the height
+int checkHeight(TreeNode* root) {
+    if (!root) return 0;  // Base case: empty node is balanced, height is 0
+
+    // Recursively get the height of the left subtree
+    int leftHeight = checkHeight(root->left);
+    if (leftHeight == -1) return -1;  // If the left subtree is not balanced, return -1
+
+    // Recursively get the height of the right subtree
+    int rightHeight = checkHeight(root->right);
+    if (rightHeight == -1) return -1;  // If the right subtree is not balanced, return -1
+
+    // If the current node's subtrees differ in height by more than 1, return -1
+    if (abs(leftHeight - rightHeight) > 1) return -1;
+
+    // Otherwise, return the height of the tree rooted at the current node
+    return max(leftHeight, rightHeight) + 1;
+}
+
+// Function to check if the tree is height-balanced
+bool isBalanced(TreeNode* root) {
+    return checkHeight(root) != -1;
+}
+
+// Example usage
+int main() {
+    // Create a balanced binary tree:
+    //        1
+    //       / \
+    //      2   3
+    //     / \ 
+    //    4   5
+    
+    TreeNode* root = new TreeNode(1);
+    root->left = new TreeNode(2);
+    root->right = new TreeNode(3);
+    root->left->left = new TreeNode(4);
+    root->left->right = new TreeNode(5);
+
+    cout << (isBalanced(root) ? "Tree is balanced" : "Tree is not balanced") << endl;
+
+    return 0;
+}
+
+// Problem: Given the root of a binary tree and an integer targetSum, return true if the tree has a root-to-leaf path such that adding up all the values along the path equals targetSum.
+#include <iostream>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+// Helper function to check if there exists a root-to-leaf path with the required sum
+bool hasPathSum(TreeNode* root, int targetSum) {
+    if (!root) return false;  // If the tree is empty, no path exists
+
+    // If we've reached a leaf node, check if the sum matches the target
+    if (!root->left && !root->right) {
+        return root->val == targetSum;
+    }
+
+    // Otherwise, recursively check the left and right subtrees
+    targetSum -= root->val;
+    return hasPathSum(root->left, targetSum) || hasPathSum(root->right, targetSum);
+}
+
+// Example usage
+int main() {
+    // Create a binary tree:
+    //        5
+    //       / \
+    //      4   8
+    //     /   / \
+    //    11  13  4
+    //   /  \      \
+    //  7    2      1
+    
+    TreeNode* root = new TreeNode(5);
+    root->left = new TreeNode(4);
+    root->right = new TreeNode(8);
+    root->left->left = new TreeNode(11);
+    root->left->left->left = new TreeNode(7);
+    root->left->left->right = new TreeNode(2);
+    root->right->left = new TreeNode(13);
+    root->right->right = new TreeNode(4);
+    root->right->right->right = new TreeNode(1);
+
+    int targetSum = 22;
+
+    cout << (hasPathSum(root, targetSum) ? "Path with target sum exists" : "No path with target sum") << endl;
+
+    return 0;
+}
+
+// Problem: Given the root of a complete binary tree, return the number of the nodes in the tree. Design an algorithm that runs in less than O( n ) time complexity.
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+// Function to calculate the height of the tree
+int treeHeight(TreeNode* root) {
+    int height = 0;
+    while (root) {
+        height++;
+        root = root->left; // Traverse left to calculate the height
+    }
+    return height;
+}
+
+// Function to count the number of nodes in a complete binary tree
+int countNodes(TreeNode* root) {
+    if (!root) return 0;
+
+    int leftHeight = treeHeight(root->left);  // Height of left subtree
+    int rightHeight = treeHeight(root->right); // Height of right subtree
+
+    // If left and right heights are the same, the left subtree is complete
+    if (leftHeight == rightHeight) {
+        // The number of nodes in the left subtree is 2^leftHeight - 1
+        // Add 1 for the root and recursively count the right subtree
+        return (1 << leftHeight) + countNodes(root->right);
+    } else {
+        // If heights differ, the right subtree is complete
+        // The number of nodes in the right subtree is 2^rightHeight - 1
+        // Add 1 for the root and recursively count the left subtree
+        return (1 << rightHeight) + countNodes(root->left);
+    }
+}
+
+// Example usage
+int main() {
+    // Create a complete binary tree:
+    //        1
+    //       / \
+    //      2   3
+    //     / \ / 
+    //    4  5 6
+
+    TreeNode* root = new TreeNode(1);
+    root->left = new TreeNode(2);
+    root->right = new TreeNode(3);
+    root->left->left = new TreeNode(4);
+    root->left->right = new TreeNode(5);
+    root->right->left = new TreeNode(6);
+
+    cout << "Number of nodes in the complete binary tree: " << countNodes(root) << endl;
+
+    return 0;
+}
+
+// Problem: Given the root of a BST and a key, delete the node with the given key in the BST.
+#include <iostream>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+// Function to find the minimum value node in the given subtree
+TreeNode* findMin(TreeNode* root) {
+    while (root && root->left) {
+        root = root->left;  // Traverse left to find the minimum node
+    }
+    return root;
+}
+
+// Function to delete a node with the given key
+TreeNode* deleteNode(TreeNode* root, int key) {
+    if (!root) return nullptr;  // If the tree is empty, return nullptr
+
+    // Traverse the tree to find the node to delete
+    if (key < root->val) {
+        root->left = deleteNode(root->left, key);  // Key is in the left subtree
+    } else if (key > root->val) {
+        root->right = deleteNode(root->right, key);  // Key is in the right subtree
+    } else {
+        // Node to be deleted is found
+
+        // Case 1: Node has no left child (or only right child)
+        if (!root->left) {
+            TreeNode* temp = root->right;
+            delete root;  // Free the node
+            return temp;  // Return the right child (could be NULL)
+        }
+        // Case 2: Node has no right child (or only left child)
+        else if (!root->right) {
+            TreeNode* temp = root->left;
+            delete root;  // Free the node
+            return temp;  // Return the left child (could be NULL)
+        }
+        // Case 3: Node has two children
+        else {
+            // Find the in-order successor (smallest node in the right subtree)
+            TreeNode* minNode = findMin(root->right);
+            root->val = minNode->val;  // Replace the value of the node with the in-order successor's value
+            root->right = deleteNode(root->right, minNode->val);  // Delete the in-order successor
+        }
+    }
+    return root;  // Return the modified root
+}
+
+// Helper function to print the tree in order (for testing)
+void inorder(TreeNode* root) {
+    if (root) {
+        inorder(root->left);
+        cout << root->val << " ";
+        inorder(root->right);
+    }
+}
+
+// Example usage
+int main() {
+    // Creating a BST:
+    //        5
+    //       / \
+    //      3   8
+    //     / \ / \
+    //    2  4 7  9
+
+    TreeNode* root = new TreeNode(5);
+    root->left = new TreeNode(3);
+    root->right = new TreeNode(8);
+    root->left->left = new TreeNode(2);
+    root->left->right = new TreeNode(4);
+    root->right->left = new TreeNode(7);
+    root->right->right = new TreeNode(9);
+
+    cout << "Inorder before deletion: ";
+    inorder(root);
+    cout << endl;
+
+    int key = 3;  // Node to be deleted
+
+    root = deleteNode(root, key);
+
+    cout << "Inorder after deletion: ";
+    inorder(root);
+    cout << endl;
+
+    return 0;
+}
+
+// Problem: Given the root of a binary tree, return the length of the diameter of the tree. The diameter of a binary tree is the length of the longest path between any two nodes in a tree.
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+// Function to calculate the height of the tree and the diameter
+int diameterOfBinaryTree(TreeNode* root, int& diameter) {
+    if (!root) return 0;
+
+    // Recursively find the height of the left and right subtrees
+    int leftHeight = diameterOfBinaryTree(root->left, diameter);
+    int rightHeight = diameterOfBinaryTree(root->right, diameter);
+
+    // Update the diameter: it could be the path through the current node
+    diameter = max(diameter, leftHeight + rightHeight);
+
+    // Return the height of the current node
+    return 1 + max(leftHeight, rightHeight);
+}
+
+// Wrapper function to initialize the diameter
+int diameterOfBinaryTree(TreeNode* root) {
+    int diameter = 0;
+    diameterOfBinaryTree(root, diameter);
+    return diameter;
+}
+
+// Example usage
+int main() {
+    // Creating a sample binary tree:
+    //        1
+    //       / \
+    //      2   3
+    //     / \   \
+    //    4   5   6
+
+    TreeNode* root = new TreeNode(1);
+    root->left = new TreeNode(2);
+    root->right = new TreeNode(3);
+    root->left->left = new TreeNode(4);
+    root->left->right = new TreeNode(5);
+    root->right->right = new TreeNode(6);
+
+    cout << "Diameter of the binary tree: " << diameterOfBinaryTree(root) << endl;
+
+    return 0;
+}
